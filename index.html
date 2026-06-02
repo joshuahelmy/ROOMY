@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roomy Studio - Interior Design & Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;600;800&display=swap');
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; color: #1a1a1a; overflow-x: hidden; }
+        h1, h2, h3 { letter-spacing: -0.02em; }
+        #navbar { transition: transform 0.4s cubic-bezier(0.165,0.84,0.44,1), padding 0.4s ease, background-color 0.4s ease; }
+        #scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: #000; z-index: 1001; width: 0%; transition: width 0.1s ease-out; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); z-index: 1000; display: none; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background-color: #ffffff; width: 90%; max-width: 1200px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: modalFadeIn 0.5s cubic-bezier(0.19,1,0.22,1); position: relative; }
+        @media (min-width: 768px) { .modal-content { flex-direction: row; height: 80vh; } }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .project-card { position: relative; overflow: hidden; transition: all 0.5s ease; }
+        .project-hidden { display: none; }
+        .project-card img { transition: transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.5s ease; filter: grayscale(100%); will-change: transform; }
+        .project-card:hover img { transform: scale(1.1); filter: grayscale(0%); }
+        .project-overlay { background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 60%); opacity: 0; transition: opacity 0.4s ease; }
+        .project-card:hover .project-overlay { opacity: 1; }
+        .filter-btn.active { color: #000000; border-bottom: 2px solid #000000; }
+        #back-to-top { transition: opacity 0.4s, transform 0.4s; opacity: 0; pointer-events: none; transform: translateY(20px); }
+        #back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .parallax-bg { will-change: transform; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'primary-black': '#000000', 'secondary-dark': '#1a1a1a', 'neutral-gray': '#808080', 'light-gray': '#f5f5f5' } } }
+        }
+    </script>
+</head>
+<body class="antialiased selection:bg-black selection:text-white">
+
+    <div id="scroll-progress"></div>
+
+    <!-- Navbar -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md border-b border-transparent transition-all duration-300">
+        <div class="max-w-[1400px] mx-auto px-6 py-5 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold tracking-tighter text-black uppercase hover-trigger">
+                ROOMY<span class="font-light text-neutral-gray"> STUDIO</span>
+            </a>
+            <div class="hidden md:flex space-x-10 text-sm font-medium tracking-wide">
+                <a href="#home" class="text-black hover:text-neutral-gray transition duration-300 hover-trigger">BERANDA</a>
+                <a href="#projects" class="text-black hover:text-neutral-gray transition duration-300 hover-trigger">PROYEK</a>
+                <a href="#about" class="text-black hover:text-neutral-gray transition duration-300 hover-trigger">TENTANG</a>
+                <a href="#contact" class="text-black hover:text-neutral-gray transition duration-300 hover-trigger">KONTAK</a>
+            </div>
+            <button id="menu-button" class="md:hidden text-black focus:outline-none hover-trigger">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full shadow-lg">
+            <div class="flex flex-col px-6 py-4 space-y-4 text-sm font-medium">
+                <a href="#home" class="text-black">BERANDA</a>
+                <a href="#projects" class="text-black">PROYEK</a>
+                <a href="#about" class="text-black">TENTANG</a>
+                <a href="#contact" class="text-black">KONTAK</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header id="home" class="relative h-screen w-full flex items-center justify-center overflow-hidden bg-secondary-dark">
+        <div class="parallax-bg absolute inset-0 h-[120%] -top-[10%] bg-[url('image/hero-bg.jpg')] bg-cover bg-center opacity-40"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-primary-dark/90 via-primary-dark/20 to-primary-dark/40"></div>
+        <div class="relative z-10 text-center px-6 max-w-5xl mx-auto" data-aos="fade-up" data-aos-duration="1200">
+            <p class="text-neutral-gray text-sm md:text-base font-medium tracking-[0.3em] mb-6 uppercase animate-pulse">Interior Design & Space Visualization</p>
+            <h1 class="text-5xl md:text-7xl lg:text-9xl font-extrabold text-white tracking-tighter mb-10 leading-none">
+                ELEVATING SPACE<br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">DEFINING LUXURY.</span>
+            </h1>
+            <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="#projects" class="hover-trigger px-10 py-4 bg-white text-black text-sm font-bold uppercase tracking-widest hover:bg-neutral-gray hover:text-white transition duration-500 transform hover:-translate-y-1">Lihat Proyek</a>
+                <a href="#contact" class="hover-trigger px-10 py-4 border border-white/30 backdrop-blur-sm text-white text-sm font-bold uppercase tracking-widest hover:bg-white hover:text-black transition duration-500 transform hover:-translate-y-1">Mulai Konsultasi</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Projects -->
+    <section id="projects" class="py-32 bg-white relative">
+        <div class="max-w-[1400px] mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-20" data-aos="fade-up">
+                <div>
+                    <h2 class="text-5xl md:text-6xl font-bold text-black mb-4 tracking-tight">Karya Pilihan</h2>
+                    <p class="text-neutral-gray text-xl font-light">Koleksi desain ruang hunian &amp; komersial terbaik.</p>
+                </div>
+                <div class="mt-8 md:mt-0 space-x-8 text-sm font-bold tracking-widest text-neutral-gray uppercase" id="portfolio-filters">
+                    <button class="filter-btn active hover:text-black transition pb-2 hover-trigger" onclick="filterProjects('all', this)">Semua</button>
+                    <button class="filter-btn hover:text-black transition pb-2 hover-trigger" onclick="filterProjects('residential', this)">Residensial</button>
+                    <button class="filter-btn hover:text-black transition pb-2 hover-trigger" onclick="filterProjects('commercial', this)">Komersial</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2" id="projects-grid">
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="residential" data-aos="fade-up" data-aos-delay="100" onclick="openModal(0)">
+                    <img src="image/Living Room Minimalis.jpg" alt="Living Room Minimalis" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Residensial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Living Room Minimalis</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="residential" data-aos="fade-up" data-aos-delay="200" onclick="openModal(1)">
+                    <img src="image/Master Bedroom Suite.jpg" alt="Master Bedroom Suite" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Residensial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Master Bedroom Suite</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="commercial" data-aos="fade-up" data-aos-delay="300" onclick="openModal(2)">
+                    <img src="image/Dining Room.jpg" alt="Ruang Makan Minimalis" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Komersial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Restoran Fine Dining</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="residential" data-aos="fade-up" data-aos-delay="400" onclick="openModal(3)">
+                    <img src="image/Open Concept Kitchen.jpg" alt="Open Concept Kitchen" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Residensial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Open Concept Kitchen</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="commercial" data-aos="fade-up" data-aos-delay="500" onclick="openModal(4)">
+                    <img src="image/Office Receptionist.jpg" alt="Office Receptionist" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Komersial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Office Receptionist</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+                <div class="project-card group relative h-[500px] w-full bg-gray-100 hover-trigger" data-category="commercial" data-aos="fade-up" data-aos-delay="600" onclick="openModal(5)">
+                    <img src="image/Clean Look Office Room.jpg" alt="Clean Look Office Room" class="w-full h-full object-cover">
+                    <div class="project-overlay absolute inset-0 flex flex-col justify-end p-10">
+                        <p class="text-white/80 text-xs font-bold uppercase tracking-widest mb-3 border-l-2 border-white pl-3">Komersial</p>
+                        <h3 class="text-white text-3xl font-bold mb-2">Clean Look Office Room</h3>
+                        <p class="text-white/60 text-sm transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition duration-500">Klik untuk detail</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="py-32 bg-light-gray relative">
+        <div class="max-w-[1400px] mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-20 items-center">
+                <div class="lg:w-1/2 order-2 lg:order-1" data-aos="fade-up" data-aos-duration="1000">
+                    <div class="w-20 h-1 bg-black mb-8"></div>
+                    <h2 class="text-5xl lg:text-7xl font-extrabold text-black mb-8 leading-none tracking-tight">
+                        RUANG <br/> FUNGSI <br/> ESTETIKA
+                    </h2>
+                    <p class="text-secondary-dark text-xl leading-relaxed mb-10 font-light">
+                        "Ruang yang baik bukan sekadar indah - ia bercerita, berfungsi, dan menghidupkan penghuninya."
+                    </p>
+                    <p class="text-neutral-gray leading-relaxed mb-8">
+                        <strong>Roomy Studio</strong> adalah studio desain interior yang berfokus pada visualisasi 3D berkualitas tinggi. Kami menggabungkan pemahaman mendalam tentang kebutuhan klien dengan estetika kontemporer menghadirkan konsep ruang yang bukan hanya memukau secara visual, tetapi juga nyaman dan fungsional untuk dihuni.
+                    </p>
+                    <div class="grid grid-cols-2 gap-y-6 text-sm font-bold tracking-widest text-black border-t border-gray-300 pt-10 uppercase">
+                        <div class="hover-trigger flex items-center"><span class="w-2 h-2 bg-black mr-3 rounded-full"></span>SketchUp Pro</div>
+                        <div class="hover-trigger flex items-center"><span class="w-2 h-2 bg-black mr-3 rounded-full"></span>AutoCAD</div>
+                        <div class="hover-trigger flex items-center"><span class="w-2 h-2 bg-black mr-3 rounded-full"></span>Enscape Rendering</div>
+                        <div class="hover-trigger flex items-center"><span class="w-2 h-2 bg-black mr-3 rounded-full"></span>3D Modeling</div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 order-1 lg:order-2 h-[600px] w-full relative group hover-trigger" data-aos="fade-left" data-aos-duration="1200">
+                    <div class="absolute inset-0 bg-black translate-x-4 translate-y-4 transition-transform duration-500 group-hover:translate-x-6 group-hover:translate-y-6"></div>
+                    <img src="image/about-photo.png" alt="Roomy Studio" class="relative z-10 w-full h-full object-cover grayscale transition duration-700 group-hover:grayscale-0">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-32 bg-secondary-dark text-white relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-white/5 rounded-full blur-[100px] animate-pulse"></div>
+        <div class="max-w-5xl mx-auto px-6 text-center relative z-10" data-aos="zoom-in-up" data-aos-duration="1000">
+            <h2 class="text-5xl md:text-7xl font-bold mb-8 tracking-tighter">WUJUDKAN RUANG IMPIAN ANDA</h2>
+            <p class="text-gray-400 text-xl mb-16 font-light max-w-2xl mx-auto">Punya ide untuk rumah, kantor, atau bisnis Anda? Mari kami bantu transformasikan menjadi desain yang memukau.</p>
+            <div class="bg-white/5 backdrop-blur-md p-10 md:p-16 border border-white/10 shadow-2xl">
+                <form action="mailto:hello@roomystudio.id" method="post" enctype="text/plain" class="space-y-8 text-left">
+                    <div class="grid md:grid-cols-2 gap-10">
+                        <div class="group">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 group-hover:text-white transition">Nama</label>
+                            <input type="text" name="name" class="hover-trigger w-full bg-transparent border-b border-gray-700 py-4 text-white text-lg focus:outline-none focus:border-white transition placeholder-gray-700" placeholder="Siapa nama Anda?">
+                        </div>
+                        <div class="group">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 group-hover:text-white transition">Email</label>
+                            <input type="email" name="email" class="hover-trigger w-full bg-transparent border-b border-gray-700 py-4 text-white text-lg focus:outline-none focus:border-white transition placeholder-gray-700" placeholder="alamat@email.com">
+                        </div>
+                    </div>
+                    <div class="group">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 group-hover:text-white transition">Tipe Proyek</label>
+                        <input type="text" name="project_type" class="hover-trigger w-full bg-transparent border-b border-gray-700 py-4 text-white text-lg focus:outline-none focus:border-white transition placeholder-gray-700" placeholder="Residensial / Komersial / Lainnya">
+                    </div>
+                    <div class="group">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 group-hover:text-white transition">Ceritakan Proyek Anda</label>
+                        <textarea name="message" rows="4" class="hover-trigger w-full bg-transparent border-b border-gray-700 py-4 text-white text-lg focus:outline-none focus:border-white transition placeholder-gray-700" placeholder="Luas ruang, konsep yang diinginkan, budget, dan detail lainnya..."></textarea>
+                    </div>
+                    <div class="text-center pt-8">
+                        <button type="submit" class="hover-trigger px-12 py-5 bg-white text-black font-bold uppercase tracking-widest hover:bg-gray-200 transition transform hover:scale-105 duration-300">Mulai Konsultasi</button>
+                    </div>
+                </form>
+                <div class="mt-16 pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+                    <a href="mailto:hello@roomystudio.id" class="hover-trigger hover:text-white transition flex items-center gap-3 mb-4 md:mb-0">
+                        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> helmy.wisudha@gmail.com
+                    </a>
+                    <a href="https://wa.me/6282242034190" class="hover-trigger hover:text-white transition">+62 822 4203 4190</a>
+                     <a href="https://wa.me/6285961088445" class="hover-trigger hover:text-white transition">+62 859 6108 8445</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12 border-t border-white/10">
+        <div class="max-w-[1400px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0 text-center md:text-left">
+                <p class="font-bold text-2xl tracking-tighter mb-1">ROOMY STUDIO</p>
+                <p class="text-gray-600 text-xs uppercase tracking-widest">© 2025 All Rights Reserved.</p>
+            </div>
+            <div class="flex space-x-8 text-sm text-gray-400 uppercase tracking-wider font-medium">
+                <a href="https://www.instagram.com/roomy.studio_" class="hover:text-white transition hover-trigger">Instagram</a>
+                <a href="https://www.linkedin.com/in/joshuahelmy" class="hover:text-white transition hover-trigger">LinkedIn</a>
+                <a href="#" class="hover:text-white transition hover-trigger">Pinterest</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top -->
+    <button id="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="hover-trigger fixed bottom-10 right-10 bg-black text-white p-5 rounded-full shadow-2xl z-40 hover:bg-neutral-gray transition transform hover:scale-110 flex items-center justify-center">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+    </button>
+
+    <!-- Modal -->
+    <div id="project-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="w-full md:w-2/3 h-64 md:h-full bg-black relative group overflow-hidden">
+                <img id="modal-image" src="" class="w-full h-full object-cover opacity-0 transition-all duration-700 transform scale-105">
+                <button onclick="prevProject(event)" class="hover-trigger absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white text-white hover:text-black p-4 rounded-full backdrop-blur-md transition transform hover:scale-110 opacity-0 group-hover:opacity-100 duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button onclick="nextProject(event)" class="hover-trigger absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white text-white hover:text-black p-4 rounded-full backdrop-blur-md transition transform hover:scale-110 opacity-0 group-hover:opacity-100 duration-300">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+            <div class="w-full md:w-1/3 p-10 md:p-14 bg-white flex flex-col justify-center relative">
+                <button onclick="closeModal()" class="hover-trigger absolute top-8 right-8 text-black hover:text-gray-500 transition transform hover:rotate-90 duration-300">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <div class="mb-auto mt-10">
+                    <p id="modal-category" class="text-neutral-gray text-xs font-bold uppercase tracking-widest mb-4">Detail Proyek</p>
+                    <h3 id="modal-title" class="text-4xl font-extrabold text-black mb-6 leading-tight tracking-tight"></h3>
+                    <div class="w-16 h-1 bg-black mb-8"></div>
+                    <p id="modal-description" class="text-secondary-dark text-lg leading-relaxed mb-8 font-light"></p>
+                </div>
+                <div class="mt-8 pt-8 border-t border-gray-100 text-sm text-neutral-gray grid grid-cols-2 gap-6">
+                    <div><span class="block text-black font-bold uppercase tracking-wider mb-1">Tahun</span>2024</div>
+                    <div><span class="block text-black font-bold uppercase tracking-wider mb-1">Kategori</span><span id="modal-cat-detail">Interior</span></div>
+                    <div class="col-span-2"><span class="block text-black font-bold uppercase tracking-wider mb-1">Software</span>SketchUp + Enscape</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, duration: 1000, offset: 50, easing: 'cubic-bezier(0.25,0.46,0.45,0.94)' });
+
+        document.querySelectorAll('.hover-trigger, a, button, .project-card').forEach(t => {
+            t.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            t.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        const navbar = document.getElementById('navbar');
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 100) { navbar.style.transform = 'translateY(-100%)'; }
+            else {
+                navbar.style.transform = 'translateY(0)';
+                if (scrollTop > 50) { navbar.classList.add('shadow-sm','py-3'); navbar.classList.remove('py-5'); }
+                else { navbar.classList.remove('shadow-sm','py-3'); navbar.classList.add('py-5'); }
+            }
+            lastScrollTop = scrollTop;
+            let h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            document.getElementById("scroll-progress").style.width = ((scrollTop / h) * 100) + "%";
+            const pb = document.querySelector('.parallax-bg');
+            if (pb) pb.style.transform = `translateY(${scrollTop * 0.5}px)`;
+            const btt = document.getElementById('back-to-top');
+            scrollTop > 500 ? btt.classList.add('visible') : btt.classList.remove('visible');
+        });
+
+        const projects = [
+            { id: 0, title: "Living Room Minimalis", category: "Residensial", description: "Ruang keluarga dengan palet netral hangat, panel kayu bertekstur alami, dan pencahayaan tersembunyi. Dirancang untuk keluarga muda yang menginginkan suasana tenang namun tetap stylish dan modern.", image: "image/Living Room Minimalis.jpg" },
+            { id: 1, title: "Master Bedroom Suite", category: "Residensial", description: "Kamar tidur utama dengan konsep sanctuary — dinding beraksen kayu gelap, built-in wardrobe terintegrasi, dan pencahayaan ambient yang menciptakan suasana mewah dan nyaman.", image: "image/Master Bedroom Suite.jpg" },
+            { id: 2, title: "Fine Dining Restaurant", category: "Komersial", description: "Ruang makan restoran dengan integrasi tangga sebagai elemen arsitektur. Memaksimalkan pencahayaan alami melalui jendela tinggi dan material premium untuk pengalaman bersantap yang tak terlupakan.", image: "image/ruang makan.jpg" },
+            { id: 3, title: "Open Concept Kitchen", category: "Residensial", description: "Dapur terbuka yang menyatu dengan ruang makan menggunakan island counter dan kabinet built-in. Desain ini mendorong interaksi keluarga sekaligus menjaga estetika yang bersih dan fungsional.", image: "image/Open Concept Kitchen.jpg" },
+            { id: 4, title: "Office Receptionist", category: "Komersial", description: "Lobby dengan konsep kontemporer — perpaduan material batu alam, logam tembaga, dan tanaman hijau sebagai focal point. Menciptakan kesan pertama yang hangat namun tetap berkarakter kuat.", image: "image/Office Receptionist.jpg" },
+            { id: 5, title: "Clean Look Office Room", category: "Komersial", description: "Desain kantor yang mendorong kolaborasi dan produktivitas. Zona kerja fleksibel, area lounge, dan palet warna netral dengan aksen hijau untuk menciptakan lingkungan kerja yang sehat dan inspiratif.", image: "image/Clean Look Office Room.jpg" }
+        ];
+
+        function filterProjects(category, btnElement) {
+            if (btnElement) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btnElement.classList.add('active'); }
+            document.querySelectorAll('.project-card').forEach(card => {
+                const c = card.getAttribute('data-category');
+                if (category === 'all' || c === category) { card.classList.remove('project-hidden'); setTimeout(() => { card.style.opacity='1'; card.style.transform='translateY(0)'; }, 50); }
+                else { card.style.opacity='0'; card.style.transform='translateY(20px)'; setTimeout(() => card.classList.add('project-hidden'), 300); }
+            });
+            setTimeout(() => AOS.refresh(), 400);
+        }
+
+        const modal = document.getElementById('project-modal');
+        const modalImg = document.getElementById('modal-image');
+        let currentProjectIndex = 0;
+
+        function openModal(index) {
+            currentProjectIndex = index; updateModalContent();
+            modal.style.display = 'flex'; document.body.style.overflow = 'hidden';
+            setTimeout(() => { modalImg.classList.remove('opacity-0','scale-105'); modalImg.classList.add('scale-100'); }, 50);
+        }
+        function closeModal() {
+            modalImg.classList.add('opacity-0','scale-105');
+            setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }, 300);
+        }
+        function updateModalContent() {
+            const p = projects[currentProjectIndex];
+            modalImg.classList.add('opacity-50');
+            setTimeout(() => {
+                document.getElementById('modal-title').innerText = p.title;
+                document.getElementById('modal-description').innerText = p.description;
+                modalImg.src = p.image;
+                document.getElementById('modal-category').innerText = p.category;
+                document.getElementById('modal-cat-detail').innerText = p.category;
+                modalImg.classList.remove('opacity-50');
+            }, 200);
+        }
+        function nextProject(e) { e.stopPropagation(); currentProjectIndex = (currentProjectIndex+1) % projects.length; updateModalContent(); }
+        function prevProject(e) { e.stopPropagation(); currentProjectIndex = (currentProjectIndex-1+projects.length) % projects.length; updateModalContent(); }
+        document.addEventListener('keydown', (e) => {
+            if (modal.style.display==='flex') {
+                if (e.key==='Escape') closeModal();
+                if (e.key==='ArrowRight') nextProject({stopPropagation:()=>{}});
+                if (e.key==='ArrowLeft') prevProject({stopPropagation:()=>{}});
+            }
+        });
+        document.getElementById('menu-button').addEventListener('click', () => document.getElementById('mobile-menu').classList.toggle('hidden'));
+    </script>
+</body>
+</html>
